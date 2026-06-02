@@ -37,7 +37,7 @@ func cleanInput(text string) []string {
 	return strings.Fields(text)
 }
 
-func commandHelp() error {
+func commandHelp(cfg *config) error {
 	helpMessage :=
 		"Welcome to the Pokedex!\nUsage:\n\nhelp: Displays a help message\nexit: Exit the Pokedex"
 
@@ -45,14 +45,21 @@ func commandHelp() error {
 	return nil
 }
 
-func commandExit() error {
+func commandExit(cfg *config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	defer os.Exit(0)
 	return nil
 }
 
-func commandMap() error {
-	res, err := http.Get("https://pokeapi.co/api/v2/location-area/")
+func commandMap(cfg *config) error {
+	url := ""
+	if cfg.nextLocationsURL == nil {
+		url = "https://pokeapi.co/api/v2/location-area/"
+	} else {
+		url = *cfg.nextLocationsURL
+	}
+
+	res, err := http.Get(url)
 	if err != nil {
 		fmt.Println("Error fetching locations")
 		return err
@@ -73,13 +80,16 @@ func commandMap() error {
 	}
 
 	for _, result := range locationsArea.Results {
-		fmt.Println(result["name"])
+		fmt.Println(result.Name)
 	}
+
+	cfg.prevLocationsURL = locationsArea.Previous
+	cfg.nextLocationsURL = locationsArea.Next
 
 	return nil
 }
 
-func commandMapb() error {
+func commandMapb(cfg *config) error {
 
 	return nil
 }
@@ -121,12 +131,11 @@ func replLoop() {
 		command := cleanedInput[0]
 
 		if _, ok := commands[command]; ok {
-			err := commands[command].callback()
+			err := commands[command].callback(config)
 			if err != nil {
 				fmt.Println(err)
+				fmt.Println("Unknown command")
 			}
-		} else {
-			fmt.Println("Unknown command")
 		}
 	}
 }

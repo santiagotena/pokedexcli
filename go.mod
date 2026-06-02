@@ -1,3 +1,3 @@
-module github.com/santiagotena/playground/pokedexcli
+module github.com/santiagotena/pokedexcli
 
-go 1.26
+go 1.26.3
