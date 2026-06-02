@@ -90,6 +90,39 @@ func commandMap(cfg *config) error {
 }
 
 func commandMapb(cfg *config) error {
+	if cfg.prevLocationsURL == nil {
+		fmt.Println("you're on the first page")
+		return nil
+	}
+
+	url := *cfg.prevLocationsURL
+
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error fetching locations")
+		return err
+	}
+	defer res.Body.Close()
+
+	dat, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Error reading response body")
+		return err
+	}
+
+	locationsArea := LocationArea{}
+	err = json.Unmarshal(dat, &locationsArea)
+	if err != nil {
+		fmt.Println("Error marshalling response body")
+		return err
+	}
+
+	for _, result := range locationsArea.Results {
+		fmt.Println(result.Name)
+	}
+
+	cfg.prevLocationsURL = locationsArea.Previous
+	cfg.nextLocationsURL = locationsArea.Next
 
 	return nil
 }
@@ -134,8 +167,9 @@ func replLoop() {
 			err := commands[command].callback(config)
 			if err != nil {
 				fmt.Println(err)
-				fmt.Println("Unknown command")
 			}
+		} else {
+			fmt.Println("Unknown command")
 		}
 	}
 }
