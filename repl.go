@@ -2,10 +2,7 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"strings"
 )
@@ -19,112 +16,6 @@ type cliCommand struct {
 type config struct {
 	nextLocationsURL *string
 	prevLocationsURL *string
-}
-
-type LocationArea struct {
-	Count    int     `json:"count"`
-	Next     *string `json:"next"`
-	Previous *string `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
-
-func cleanInput(text string) []string {
-	text = strings.ToLower(text)
-	text = strings.ReplaceAll(text, ",", "")
-	return strings.Fields(text)
-}
-
-func commandHelp(cfg *config) error {
-	helpMessage :=
-		"Welcome to the Pokedex!\nUsage:\n\nhelp: Displays a help message\nexit: Exit the Pokedex"
-
-	fmt.Println(helpMessage)
-	return nil
-}
-
-func commandExit(cfg *config) error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	defer os.Exit(0)
-	return nil
-}
-
-func commandMap(cfg *config) error {
-	url := ""
-	if cfg.nextLocationsURL == nil {
-		url = "https://pokeapi.co/api/v2/location-area/"
-	} else {
-		url = *cfg.nextLocationsURL
-	}
-
-	res, err := http.Get(url)
-	if err != nil {
-		fmt.Println("Error fetching locations")
-		return err
-	}
-	defer res.Body.Close()
-
-	dat, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("Error reading response body")
-		return err
-	}
-
-	locationsArea := LocationArea{}
-	err = json.Unmarshal(dat, &locationsArea)
-	if err != nil {
-		fmt.Println("Error marshalling response body")
-		return err
-	}
-
-	for _, result := range locationsArea.Results {
-		fmt.Println(result.Name)
-	}
-
-	cfg.prevLocationsURL = locationsArea.Previous
-	cfg.nextLocationsURL = locationsArea.Next
-
-	return nil
-}
-
-func commandMapb(cfg *config) error {
-	if cfg.prevLocationsURL == nil {
-		fmt.Println("you're on the first page")
-		return nil
-	}
-
-	url := *cfg.prevLocationsURL
-
-	res, err := http.Get(url)
-	if err != nil {
-		fmt.Println("Error fetching locations")
-		return err
-	}
-	defer res.Body.Close()
-
-	dat, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println("Error reading response body")
-		return err
-	}
-
-	locationsArea := LocationArea{}
-	err = json.Unmarshal(dat, &locationsArea)
-	if err != nil {
-		fmt.Println("Error marshalling response body")
-		return err
-	}
-
-	for _, result := range locationsArea.Results {
-		fmt.Println(result.Name)
-	}
-
-	cfg.prevLocationsURL = locationsArea.Previous
-	cfg.nextLocationsURL = locationsArea.Next
-
-	return nil
 }
 
 func replLoop() {
@@ -172,4 +63,10 @@ func replLoop() {
 			fmt.Println("Unknown command")
 		}
 	}
+}
+
+func cleanInput(text string) []string {
+	text = strings.ToLower(text)
+	text = strings.ReplaceAll(text, ",", "")
+	return strings.Fields(text)
 }
