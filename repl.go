@@ -23,6 +23,12 @@ type config struct {
 }
 
 func replLoop() {
+	commands := getCommands()
+	config := &config{cache: pokecache.NewCache(5 * time.Minute)}
+	runRepl(commands, config)
+}
+
+func getCommands() map[string]cliCommand {
 	commands := map[string]cliCommand{
 		"exit": {
 			name:        "exit",
@@ -46,9 +52,10 @@ func replLoop() {
 		},
 	}
 
-	config := &config{}
-	config.cache = pokecache.NewCache(5 * time.Minute)
+	return commands
+}
 
+func runRepl(commands map[string]cliCommand, config *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
