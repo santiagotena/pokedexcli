@@ -7,19 +7,19 @@ import (
 	"github.com/santiagotena/pokedexcli/internal/pokeapi"
 )
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, param1 string) error {
 	if cfg.prevLocationsURL == nil {
 		fmt.Println("you're on the first page")
 		return nil
 	}
 	url := *cfg.prevLocationsURL
 
-	cache, ok := cfg.cache.Get(url)
+	cache, _, ok := cfg.cache.Get(url)
 	if ok {
 		locationAreas := pokeapi.LocationAreas{}
 		err := json.Unmarshal(cache, &locationAreas)
 		if err != nil {
-			fmt.Println("Error marshalling response body")
+			fmt.Println("Error unmarshalling response body")
 			return err
 		}
 		for _, result := range locationAreas.Results {

@@ -14,6 +14,7 @@ type Cache struct {
 type cacheEntry struct {
 	createdAt time.Time
 	val       []byte
+	pokemons  []string
 }
 
 func NewCache(interval time.Duration) *Cache {
@@ -25,21 +26,22 @@ func NewCache(interval time.Duration) *Cache {
 	return c
 }
 
-func (c *Cache) Add(key string, value []byte) {
+func (c *Cache) Add(key string, value []byte, pokemons []string) {
 	c.mu.Lock()
-	c.items[key] = cacheEntry{createdAt: time.Now(), val: value}
+	c.items[key] = cacheEntry{createdAt: time.Now(), val: value, pokemons: pokemons}
 	c.mu.Unlock()
 }
 
-func (c *Cache) Get(key string) ([]byte, bool) {
+func (c *Cache) Get(key string) ([]byte, []string, bool) {
 	c.mu.Lock()
 	if _, ok := c.items[key]; ok {
 		val := c.items[key].val
+		pokemons := c.items[key].pokemons
 		c.mu.Unlock()
-		return val, true
+		return val, pokemons, true
 	} else {
 		c.mu.Unlock()
-		return nil, false
+		return nil, nil, false
 	}
 }
 

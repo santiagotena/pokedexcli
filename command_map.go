@@ -7,7 +7,7 @@ import (
 	"github.com/santiagotena/pokedexcli/internal/pokeapi"
 )
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, param1 string) error {
 	url := ""
 	if cfg.nextLocationsURL == nil {
 		url = pokeapi.BaseURL + pokeapi.LocationAreasEndpoint
@@ -15,12 +15,12 @@ func commandMap(cfg *config) error {
 		url = *cfg.nextLocationsURL
 	}
 
-	cache, ok := cfg.cache.Get(url)
+	cache, _, ok := cfg.cache.Get(url)
 	if ok {
 		locationAreas := pokeapi.LocationAreas{}
 		err := json.Unmarshal(cache, &locationAreas)
 		if err != nil {
-			fmt.Println("Error marshalling response body")
+			fmt.Println("Error unmarshalling response body")
 			return err
 		}
 		for _, result := range locationAreas.Results {
@@ -37,7 +37,7 @@ func commandMap(cfg *config) error {
 	}
 	cfg.prevLocationsURL = prev
 	cfg.nextLocationsURL = next
-	cfg.cache.Add(url, dat)
+	cfg.cache.Add(url, dat, nil)
 
 	return nil
 }
