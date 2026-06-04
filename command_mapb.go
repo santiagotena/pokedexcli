@@ -14,7 +14,7 @@ func commandMapb(cfg *config) error {
 
 	url := *cfg.prevLocationsURL
 
-	prev, next, err := pokeapi.FetchLocations(url)
+	prev, next, _, err := pokeapi.FetchLocations(url)
 	if err != nil {
 		return err
 	}

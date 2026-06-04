@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/santiagotena/pokedexcli/internal/pokecache"
 )
 
 type cliCommand struct {
@@ -16,6 +19,7 @@ type cliCommand struct {
 type config struct {
 	nextLocationsURL *string
 	prevLocationsURL *string
+	cache            *pokecache.Cache
 }
 
 func replLoop() {
@@ -43,6 +47,7 @@ func replLoop() {
 	}
 
 	config := &config{}
+	config.cache = pokecache.NewCache(5 * time.Minute)
 
 	scanner := bufio.NewScanner(os.Stdin)
 
