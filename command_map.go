@@ -10,32 +10,31 @@ import (
 func commandMap(cfg *config) error {
 	url := ""
 	if cfg.nextLocationsURL == nil {
-		url = pokeapi.BaseURL + pokeapi.LocationAreaEndpoint
+		url = pokeapi.BaseURL + pokeapi.LocationAreasEndpoint
 	} else {
 		url = *cfg.nextLocationsURL
 	}
 
 	cache, ok := cfg.cache.Get(url)
 	if ok {
-		locationsArea := pokeapi.LocationArea{}
-		err := json.Unmarshal(cache, &locationsArea)
+		locationAreas := pokeapi.LocationAreas{}
+		err := json.Unmarshal(cache, &locationAreas)
 		if err != nil {
 			fmt.Println("Error marshalling response body")
 			return err
 		}
-		for _, result := range locationsArea.Results {
+		for _, result := range locationAreas.Results {
 			fmt.Println(result.Name)
 		}
-		cfg.prevLocationsURL = locationsArea.Previous
-		cfg.nextLocationsURL = locationsArea.Next
+		cfg.prevLocationsURL = locationAreas.Previous
+		cfg.nextLocationsURL = locationAreas.Next
 		return nil
 	}
 
-	prev, next, dat, err := pokeapi.FetchLocations(url)
+	prev, next, dat, err := pokeapi.FetchLocationAreas(url)
 	if err != nil {
 		return err
 	}
-
 	cfg.prevLocationsURL = prev
 	cfg.nextLocationsURL = next
 	cfg.cache.Add(url, dat)
