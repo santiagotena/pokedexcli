@@ -10,7 +10,7 @@ import (
 func commandMap(cfg *config) error {
 	url := ""
 	if cfg.nextLocationsURL == nil {
-		url = "https://pokeapi.co/api/v2/location-area/"
+		url = pokeapi.BaseURL + pokeapi.LocationAreaEndpoint
 	} else {
 		url = *cfg.nextLocationsURL
 	}
