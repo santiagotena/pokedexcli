@@ -70,3 +70,32 @@ func FetchArea(url string, areaName string) ([]string, error) {
 
 	return pokemons, nil
 }
+
+func FetchPokemonProfile(url string) (CompletePokemonProfile, bool, error) {
+	completePokemonProfile := CompletePokemonProfile{}
+
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error fetching areas")
+		return CompletePokemonProfile{}, false, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == 404 {
+		return CompletePokemonProfile{}, false, nil
+	}
+
+	dat, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Error reading response body")
+		return CompletePokemonProfile{}, false, err
+	}
+
+	err = json.Unmarshal(dat, &completePokemonProfile)
+	if err != nil {
+		fmt.Println("Error unmarshalling response body")
+		return CompletePokemonProfile{}, false, err
+	}
+
+	return completePokemonProfile, true, nil
+}
