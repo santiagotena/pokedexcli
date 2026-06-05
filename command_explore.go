@@ -7,6 +7,10 @@ import (
 )
 
 func commandExplore(cfg *config, areaName string) error {
+	if areaName == "" {
+		return nil
+	}
+
 	_, pokemons, ok := cfg.cache.Get(areaName)
 	if ok {
 		fmt.Println("Exploring " + areaName + "...")
