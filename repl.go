@@ -33,7 +33,7 @@ type PokemonProfile struct {
 
 func replLoop() {
 	commands := getCommands()
-	config := &config{cache: pokecache.NewCache(5 * time.Minute)}
+	config := &config{cache: pokecache.NewCache(5 * time.Minute), pokedex: make(map[string]PokemonProfile)}
 	runRepl(commands, config)
 }
 
