@@ -19,7 +19,16 @@ type cliCommand struct {
 type config struct {
 	nextLocationsURL *string
 	prevLocationsURL *string
+	pokedex          map[string]PokemonProfile
 	cache            *pokecache.Cache
+}
+
+type PokemonProfile struct {
+	height         int
+	weight         int
+	stats          map[string]int
+	types          []string
+	baseExperience int
 }
 
 func replLoop() {
