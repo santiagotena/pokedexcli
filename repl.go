@@ -69,6 +69,10 @@ func runRepl(commands map[string]cliCommand, config *config) {
 		text := scanner.Text()
 		cleanedInput := cleanInput(text)
 
+		if len(cleanedInput) == 0 {
+			continue
+		}
+
 		command := cleanedInput[0]
 
 		param1 := ""
